@@ -1,0 +1,9 @@
+apiVersion: kubescheduling.k8s.io/v1beta1
+kind: Budget
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: budget-sample
+spec:
+  # Add fields here
+  foo: bar
