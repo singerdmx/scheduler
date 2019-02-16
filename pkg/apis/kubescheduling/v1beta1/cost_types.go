@@ -23,10 +23,27 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// ResourceName is the type of resources
+type ResourceName string
+
+const (
+	ResourceCPU      ResourceName = "cpu"
+	ResourceMemory   ResourceName = "memory"
+	ResourceGPU      ResourceName = "nvidia.com/gpu"
+	ResourceStorage  ResourceName = "storage"
+	ResourceTime     ResourceName = "time"
+	ResourcePriority ResourceName = "priority"
+)
+
+// ResourceCostList is a set of (resource name, cost) pairs.
+type ResourceCostList map[ResourceName]float64
+
 // CostSpec defines the desired state of Cost
 type CostSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	Resources ResourceCostList `json:"resources,omitempty"`
 }
 
 // CostStatus defines the observed state of Cost
