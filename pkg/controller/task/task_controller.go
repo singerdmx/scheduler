@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"time"
 
 	kubeschedulingv1beta1 "github.com/scheduler/pkg/apis/kubescheduling/v1beta1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -114,12 +115,33 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, err
 	}
 
+	instance.Status.Phase = kubeschedulingv1beta1.TaskQueued
+	err = r.Update(context.Background(), instance)
+	if err != nil {
+		log.Error(err, "TaskQueued %v failed", instance)
+		return reconcile.Result{}, err
+	}
+
 	uid := instance.Spec.UID
 	budget, err := budgetWithUID(uid, request.Namespace, r)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 	log.Info("Found budget %v for uid %s", budget, uid)
+
+	costName := instance.Spec.Cost
+	cost, err := costWithName(costName, request.Namespace, r)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+	log.Info("Found cost %v for name %s", cost, costName)
+
+	instance.Status.Phase = kubeschedulingv1beta1.TaskReady
+	err = r.Update(context.Background(), instance)
+	if err != nil {
+		log.Error(err, "TaskReady %v failed", instance)
+		return reconcile.Result{}, err
+	}
 
 	// TODO(user): Change this to be the object type created by your controller
 	// Define the desired Deployment object
@@ -171,6 +193,8 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 			return reconcile.Result{}, err
 		}
 	}
+
+	go runTask(instance, r)
 	return reconcile.Result{}, nil
 }
 
@@ -187,4 +211,34 @@ func budgetWithUID(uid string, namespace string, r *ReconcileTask) (*kubeschedul
 	}
 
 	return nil, fmt.Errorf("Unable to find uid %s in budgets", uid)
+}
+
+func costWithName(costName string, namespace string, r *ReconcileTask) (*kubeschedulingv1beta1.Cost, error) {
+	costs := &kubeschedulingv1beta1.CostList{}
+	err := r.List(context.Background(), client.InNamespace(namespace), costs)
+	if err != nil {
+		return nil, err
+	}
+	for _, cost := range costs.Items {
+		if cost.Name == costName {
+			return &cost, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Unable to find cost with name %s in budgets", costName)
+}
+
+func runTask(task *kubeschedulingv1beta1.Task, r *ReconcileTask) {
+	task.Status.Phase = kubeschedulingv1beta1.TaskInProgress
+	err := r.Update(context.Background(), task)
+	if err != nil {
+		log.Error(err, "TaskInProgress %v failed", task)
+	}
+	// simulate running task
+	time.Sleep(100 * time.Second)
+	task.Status.Phase = kubeschedulingv1beta1.TaskComplete
+	err = r.Update(context.Background(), task)
+	if err != nil {
+		log.Error(err, "runTask %v failed", task)
+	}
 }
