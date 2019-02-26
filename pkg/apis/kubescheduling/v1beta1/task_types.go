@@ -27,12 +27,35 @@ import (
 type TaskSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	// ID of user that submitted the task
+	UID string `json:"uid,omitempty"`
+
+	// The time it takes to run the task in seconds
+	Time *int32 `json:"time,omitempty"`
+
+	// The cost to run the task
+	Cost Cost `json:"cost,omitempty"`
 }
+
+// TaskPhase represents the state of the task.
+type TaskPhase string
+
+const (
+	TaskQueued     TaskPhase = "Queued"
+	TaskReady      TaskPhase = "Ready"
+	TaskInProgress TaskPhase = "InProgress"
+	TaskFailed     TaskPhase = "Failed"
+	TaskComplete   TaskPhase = "Complete"
+)
 
 // TaskStatus defines the observed state of Task
 type TaskStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// The current phase of this task in its state machine transaction
+	// +optional
+	Phase TaskPhase `json:"phase,omitempty"`
 }
 
 // +genclient

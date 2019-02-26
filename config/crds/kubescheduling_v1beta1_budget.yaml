@@ -27,6 +27,16 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            amount:
+              description: Amount can be used for the user
+              format: double
+              type: number
+            uid:
+              description: ID of user that owns the budget
+              type: string
+          required:
+          - amount
           type: object
         status:
           type: object

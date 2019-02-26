@@ -27,8 +27,47 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            cost:
+              description: The cost to run the task
+              properties:
+                apiVersion:
+                  description: 'APIVersion defines the versioned schema of this representation
+                    of an object. Servers should convert recognized schemas to the
+                    latest internal value, and may reject unrecognized values. More
+                    info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+                  type: string
+                kind:
+                  description: 'Kind is a string value representing the REST resource
+                    this object represents. Servers may infer this from the endpoint
+                    the client submits requests to. Cannot be updated. In CamelCase.
+                    More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+                  type: string
+                metadata:
+                  type: object
+                spec:
+                  properties:
+                    resources:
+                      type: object
+                  type: object
+                status:
+                  type: object
+              type: object
+            time:
+              description: The time it takes to run the task in seconds
+              format: int32
+              type: integer
+            uid:
+              description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                Important: Run "make" to regenerate code after modifying this file
+                ID of user that submitted the task'
+              type: string
           type: object
         status:
+          properties:
+            phase:
+              description: The current phase of this task in its state machine transaction
+              type: string
           type: object
   version: v1beta1
 status:

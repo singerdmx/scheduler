@@ -27,6 +27,12 @@ import (
 type BudgetSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	// ID of user that owns the budget
+	UID string `json:"uid,omitempty"`
+
+	// Amount can be used for the user
+	Amount float64 `json:"amount"`
 }
 
 // BudgetStatus defines the observed state of Budget
