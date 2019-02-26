@@ -27,9 +27,6 @@ spec:
         metadata:
           type: object
         spec:
-          properties:
-            resources:
-              type: object
           type: object
         status:
           type: object
