@@ -1,9 +1,22 @@
+---
 apiVersion: kubescheduling.k8s.io/v1beta1
 kind: Task
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: task-sample
+  name: task1
 spec:
-  # Add fields here
-  foo: bar
+  uid: u1
+  time: 3000
+  cost: regular-task-cost
+---
+apiVersion: kubescheduling.k8s.io/v1beta1
+kind: Task
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: task2
+spec:
+  uid: u2
+  time: 5000
+  cost: high-priority-task-cost

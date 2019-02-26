@@ -34,7 +34,7 @@ type TaskSpec struct {
 	Time *int32 `json:"time,omitempty"`
 
 	// The cost to run the task
-	Cost Cost `json:"cost,omitempty"`
+	Cost string `json:"cost,omitempty"`
 }
 
 // TaskPhase represents the state of the task.

@@ -307,7 +307,6 @@ func (in *TaskSpec) DeepCopyInto(out *TaskSpec) {
 		*out = new(int32)
 		**out = **in
 	}
-	in.Cost.DeepCopyInto(&out.Cost)
 	return
 }
 
