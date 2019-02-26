@@ -31,10 +31,6 @@ spec:
             cost:
               description: The cost to run the task
               type: string
-            time:
-              description: The time it takes to run the task in seconds
-              format: int32
-              type: integer
             uid:
               description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                 Important: Run "make" to regenerate code after modifying this file

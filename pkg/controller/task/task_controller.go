@@ -18,6 +18,7 @@ package task
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	kubeschedulingv1beta1 "github.com/scheduler/pkg/apis/kubescheduling/v1beta1"
@@ -113,6 +114,13 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, err
 	}
 
+	uid := instance.Spec.UID
+	budget, err := budgetWithUID(uid, request.Namespace, r)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+	log.Info("Found budget %v for uid %s", budget, uid)
+
 	// TODO(user): Change this to be the object type created by your controller
 	// Define the desired Deployment object
 	deploy := &appsv1.Deployment{
@@ -164,4 +172,19 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		}
 	}
 	return reconcile.Result{}, nil
+}
+
+func budgetWithUID(uid string, namespace string, r *ReconcileTask) (*kubeschedulingv1beta1.Budget, error) {
+	budgets := &kubeschedulingv1beta1.BudgetList{}
+	err := r.List(context.Background(), client.InNamespace(namespace), budgets)
+	if err != nil {
+		return nil, err
+	}
+	for _, budget := range budgets.Items {
+		if budget.Spec.UID == uid {
+			return &budget, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Unable to find uid %s in budgets", uid)
 }

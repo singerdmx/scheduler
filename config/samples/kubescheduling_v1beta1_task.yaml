@@ -7,7 +7,6 @@ metadata:
   name: task1
 spec:
   uid: u1
-  time: 3000
   cost: regular-task-cost
 ---
 apiVersion: kubescheduling.k8s.io/v1beta1
@@ -18,5 +17,4 @@ metadata:
   name: task2
 spec:
   uid: u2
-  time: 5000
   cost: high-priority-task-cost
