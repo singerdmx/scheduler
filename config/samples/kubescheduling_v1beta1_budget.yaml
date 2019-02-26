@@ -4,7 +4,7 @@ kind: Budget
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: budget-sample
+  name: u1-budget
 spec:
   uid: u1
   amount: 50
@@ -14,7 +14,7 @@ kind: Budget
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: budget-sample
+  name: u2-budget
 spec:
   uid: u2
   amount: 150
