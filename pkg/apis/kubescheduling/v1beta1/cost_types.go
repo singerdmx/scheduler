@@ -31,7 +31,6 @@ const (
 	ResourceMemory   ResourceName = "memory"
 	ResourceGPU      ResourceName = "nvidia.com/gpu"
 	ResourceStorage  ResourceName = "storage"
-	ResourceTime     ResourceName = "time"
 	ResourcePriority ResourceName = "priority"
 )
 

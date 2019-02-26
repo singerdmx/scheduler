@@ -1,3 +1,4 @@
+---
 apiVersion: kubescheduling.k8s.io/v1beta1
 kind: Cost
 metadata:
@@ -10,5 +11,18 @@ spec:
     memory: 0.005
     nvidia.com/gpu: 1
     storage: 5
-    time: 100
     priority: 3
+---
+apiVersion: kubescheduling.k8s.io/v1beta1
+kind: Cost
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: high-priority-task-cost
+spec:
+  resources:
+    cpu: 0.3
+    memory: 0.005
+    nvidia.com/gpu: 1
+    storage: 8
+    priority: 5
