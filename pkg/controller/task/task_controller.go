@@ -292,14 +292,14 @@ func costWithName(costName string, namespace string, r *ReconcileTask) (*kubesch
 }
 
 func runTask(task *kubeschedulingv1beta1.Task, r *ReconcileTask) {
-	log.Info("Start running task ", task.Name)
+	log.Info("Start running task " + task.Name)
 	err := updateTaskPhase(task, r, kubeschedulingv1beta1.TaskInProgress)
 	if err != nil {
 		return
 	}
 	// simulate running task
 	time.Sleep(100 * time.Second)
-	log.Info("task ", task.Name, " completed")
+	log.Info("task " + task.Name + " completed")
 	updateTaskPhase(task, r, kubeschedulingv1beta1.TaskComplete)
 }
 
