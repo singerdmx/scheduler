@@ -130,7 +130,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		updateTaskPhase(instance, r, kubeschedulingv1beta1.TaskFailed)
 		return reconcile.Result{}, err
 	}
-	log.Info(fmt.Sprintf("Found budget %v for uid %s", budget, uid))
+	log.Info(fmt.Sprintf("Found budget %v for uid %s", budget.Name, uid))
 
 	tasks, err := allRunningTasksForUser(uid, request.Namespace, r)
 	if err != nil {
@@ -145,7 +145,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 			updateTaskPhase(instance, r, kubeschedulingv1beta1.TaskFailed)
 			return reconcile.Result{}, err
 		}
-		log.Info(fmt.Sprintf("Found cost %v for name %s", c, task.Spec.Cost))
+		log.Info(fmt.Sprintf("Found cost %v", c.Name))
 		totalCostForAllTasks += totalCost(c)
 	}
 
@@ -155,13 +155,13 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		updateTaskPhase(instance, r, kubeschedulingv1beta1.TaskFailed)
 		return reconcile.Result{}, err
 	}
-	log.Info(fmt.Sprintf("Found cost %v for name %s", cost, costName))
+	log.Info(fmt.Sprintf("Found cost %v", cost.Name))
 
 	budgetAmount := budget.Spec.Amount
 	if budgetAmount < totalCostForAllTasks+totalCost(cost) {
 		instance.Status.Message = "Task does not have enough budget"
 		updateTaskPhase(instance, r, kubeschedulingv1beta1.TaskFailed)
-		return reconcile.Result{}, fmt.Errorf("Task %v does not have enough budget", instance)
+		return reconcile.Result{}, fmt.Errorf("Task %v does not have enough budget", instance.Name)
 	}
 
 	err = updateTaskPhase(instance, r, kubeschedulingv1beta1.TaskReady)
@@ -235,7 +235,7 @@ func allRunningTasksForUser(uid string, namespace string, r *ReconcileTask) ([]k
 	for _, task := range taskList.Items {
 		phase := task.Status.Phase
 		if task.Spec.UID == uid && phase == kubeschedulingv1beta1.TaskInProgress {
-			log.Info(fmt.Sprintf("Found running task %v for user %s", task, uid))
+			log.Info(fmt.Sprintf("Found running task %v for user %s", task.Name, uid))
 			tasks = append(tasks, task)
 		}
 	}
@@ -256,7 +256,7 @@ func totalCost(cost *kubeschedulingv1beta1.Cost) float64 {
 	}
 
 	total *= priority
-	log.Info(fmt.Sprintf("Total amount for %v is %v", cost, total))
+	log.Info(fmt.Sprintf("Total amount for %v is %v", cost.Name, total))
 	return total
 }
 
@@ -291,12 +291,14 @@ func costWithName(costName string, namespace string, r *ReconcileTask) (*kubesch
 }
 
 func runTask(task *kubeschedulingv1beta1.Task, r *ReconcileTask) {
+	log.Info("Start running task ", task.Name)
 	err := updateTaskPhase(task, r, kubeschedulingv1beta1.TaskInProgress)
 	if err != nil {
 		return
 	}
 	// simulate running task
 	time.Sleep(100 * time.Second)
+	log.Info("task ", task.Name, " completed")
 	updateTaskPhase(task, r, kubeschedulingv1beta1.TaskComplete)
 }
 
@@ -304,7 +306,7 @@ func updateTaskPhase(task *kubeschedulingv1beta1.Task, r *ReconcileTask, phase k
 	task.Status.Phase = phase
 	err := r.Update(context.Background(), task)
 	if err != nil {
-		log.Error(err, fmt.Sprintf("update Task %v to %v failed", task, phase))
+		log.Error(err, fmt.Sprintf("update Task %v to %v failed", task.Name, phase))
 	}
 
 	return err
