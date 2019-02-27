@@ -21,8 +21,22 @@ metadata:
   name: high-priority-task-cost
 spec:
   resources:
-    cpu: 0.3
-    memory: 0.005
+    cpu: 33
+    memory: 15
     nvidia.com/gpu: 0
     storage: 80
     priority: 5
+---
+apiVersion: kubescheduling.k8s.io/v1beta1
+kind: Cost
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: impossible-cost
+spec:
+  resources:
+    cpu: 3000
+    memory: 5000
+    nvidia.com/gpu: 1000
+    storage: 8000
+    priority: 50
