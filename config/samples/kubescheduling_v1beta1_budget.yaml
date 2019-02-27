@@ -7,7 +7,7 @@ metadata:
   name: u1-budget
 spec:
   uid: u1
-  amount: 50
+  amount: 500
 ---
 apiVersion: kubescheduling.k8s.io/v1beta1
 kind: Budget
