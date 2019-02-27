@@ -292,13 +292,13 @@ func runTask(task *kubeschedulingv1beta1.Task, r *ReconcileTask) {
 	task.Status.Phase = kubeschedulingv1beta1.TaskInProgress
 	err := r.Update(context.Background(), task)
 	if err != nil {
-		log.Error(err, "TaskInProgress %v failed", task)
+		log.Error(err, fmt.Sprintf("TaskInProgress %v failed", task))
 	}
 	// simulate running task
 	time.Sleep(100 * time.Second)
 	task.Status.Phase = kubeschedulingv1beta1.TaskComplete
 	err = r.Update(context.Background(), task)
 	if err != nil {
-		log.Error(err, "runTask %v failed", task)
+		log.Error(err, fmt.Sprintf("runTask %v failed", task))
 	}
 }
