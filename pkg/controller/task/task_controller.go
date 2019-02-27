@@ -169,6 +169,8 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, err
 	}
 
+	go runTask(instance, r)
+
 	// TODO(user): Change this to be the object type created by your controller
 	// Define the desired Deployment object
 	deploy := &appsv1.Deployment{
@@ -220,7 +222,6 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		}
 	}
 
-	runTask(instance, r)
 	return reconcile.Result{}, nil
 }
 
