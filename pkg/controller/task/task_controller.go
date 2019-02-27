@@ -220,7 +220,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		}
 	}
 
-	go runTask(instance, r)
+	runTask(instance, r)
 	return reconcile.Result{}, nil
 }
 
