@@ -3,7 +3,7 @@ kind: Task
 metadata:
   labels:
     controller-tools.k8s.io: "1.0"
-  name: task1
+  name: task4
 spec:
   uid: u1
   cost: impossible-cost
