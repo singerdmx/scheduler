@@ -114,6 +114,10 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		// Error reading the object - requeue the request.
 		return reconcile.Result{}, err
 	}
+	if instance.Status.Phase == kubeschedulingv1beta1.TaskComplete ||
+		instance.Status.Phase == kubeschedulingv1beta1.TaskFailed {
+		return reconcile.Result{}, nil
+	}
 
 	instance.Status.Phase = kubeschedulingv1beta1.TaskQueued
 	err = r.Update(context.Background(), instance)
@@ -127,7 +131,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	log.Info("Found budget %v for uid %s", budget, uid)
+	log.Info(fmt.Sprintf("Found budget %v for uid %s", budget, uid))
 
 	tasks, err := allRunningTasksForUser(uid, request.Namespace, r)
 	if err != nil {
@@ -140,7 +144,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		if err != nil {
 			return reconcile.Result{}, err
 		}
-		log.Info("Found cost %v for name %s", c, task.Spec.Cost)
+		log.Info(fmt.Sprintf("Found cost %v for name %s", c, task.Spec.Cost))
 		totalCostForAllTasks += totalCost(c)
 	}
 
@@ -149,7 +153,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 	if err != nil {
 		return reconcile.Result{}, err
 	}
-	log.Info("Found cost %v for name %s", cost, costName)
+	log.Info(fmt.Sprintf("Found cost %v for name %s", cost, costName))
 
 	budgetAmount := budget.Spec.Amount
 	if budgetAmount < totalCostForAllTasks+totalCost(cost) {
@@ -229,7 +233,7 @@ func allRunningTasksForUser(uid string, namespace string, r *ReconcileTask) ([]k
 	for _, task := range taskList.Items {
 		phase := task.Status.Phase
 		if task.Spec.UID == uid && phase == kubeschedulingv1beta1.TaskInProgress {
-			log.Info("Found running task %v for user %s", task, uid)
+			log.Info(fmt.Sprintf("Found running task %v for user %s", task, uid))
 			tasks = append(tasks, task)
 		}
 	}
@@ -250,7 +254,7 @@ func totalCost(cost *kubeschedulingv1beta1.Cost) float64 {
 	}
 
 	total *= priority
-	log.Info("Total amount for %v is %v", cost, total)
+	log.Info(fmt.Sprintf("Total amount for %v is %v", cost, total))
 	return total
 }
 
