@@ -114,8 +114,7 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 		// Error reading the object - requeue the request.
 		return reconcile.Result{}, err
 	}
-	if instance.Status.Phase == kubeschedulingv1beta1.TaskComplete ||
-		instance.Status.Phase == kubeschedulingv1beta1.TaskFailed {
+	if instance.Status.Phase != "" {
 		return reconcile.Result{}, nil
 	}
 
