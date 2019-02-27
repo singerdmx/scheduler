@@ -39,6 +39,9 @@ spec:
           type: object
         status:
           properties:
+            message:
+              description: Addtional message about the status
+              type: string
             phase:
               description: The current phase of this task in its state machine transaction
               type: string

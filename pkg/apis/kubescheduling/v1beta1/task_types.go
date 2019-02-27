@@ -53,6 +53,10 @@ type TaskStatus struct {
 	// The current phase of this task in its state machine transaction
 	// +optional
 	Phase TaskPhase `json:"phase,omitempty"`
+
+	// Addtional message about the status
+	// +optional
+	Message string `json:"message,omitempty"`
 }
 
 // +genclient
