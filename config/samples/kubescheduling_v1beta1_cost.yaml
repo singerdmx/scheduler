@@ -7,10 +7,10 @@ metadata:
   name: regular-task-cost
 spec:
   resources:
-    cpu: 0.3
-    memory: 0.005
+    cpu: 3
+    memory: 5
     nvidia.com/gpu: 1
-    storage: 5
+    storage: 50
     priority: 3
 ---
 apiVersion: kubescheduling.k8s.io/v1beta1
@@ -23,6 +23,6 @@ spec:
   resources:
     cpu: 0.3
     memory: 0.005
-    nvidia.com/gpu: 1
-    storage: 8
+    nvidia.com/gpu: 0
+    storage: 80
     priority: 5

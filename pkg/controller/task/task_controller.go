@@ -129,12 +129,32 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 	}
 	log.Info("Found budget %v for uid %s", budget, uid)
 
+	tasks, err := allRunningTasksForUser(uid, request.Namespace, r)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	var totalCostForAllTasks float64
+	for _, task := range tasks {
+		c, err := costWithName(task.Spec.Cost, request.Namespace, r)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
+		log.Info("Found cost %v for name %s", c, task.Spec.Cost)
+		totalCostForAllTasks += totalCost(c)
+	}
+
 	costName := instance.Spec.Cost
 	cost, err := costWithName(costName, request.Namespace, r)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
 	log.Info("Found cost %v for name %s", cost, costName)
+
+	budgetAmount := budget.Spec.Amount
+	if budgetAmount < totalCostForAllTasks+totalCost(cost) {
+		return reconcile.Result{}, fmt.Errorf("Task %v does not have enough budget", instance)
+	}
 
 	instance.Status.Phase = kubeschedulingv1beta1.TaskReady
 	err = r.Update(context.Background(), instance)
@@ -196,6 +216,42 @@ func (r *ReconcileTask) Reconcile(request reconcile.Request) (reconcile.Result, 
 
 	go runTask(instance, r)
 	return reconcile.Result{}, nil
+}
+
+func allRunningTasksForUser(uid string, namespace string, r *ReconcileTask) ([]kubeschedulingv1beta1.Task, error) {
+	taskList := &kubeschedulingv1beta1.TaskList{}
+	err := r.List(context.Background(), client.InNamespace(namespace), taskList)
+	if err != nil {
+		return nil, err
+	}
+
+	tasks := []kubeschedulingv1beta1.Task{}
+	for _, task := range taskList.Items {
+		phase := task.Status.Phase
+		if task.Spec.UID == uid && phase == kubeschedulingv1beta1.TaskInProgress {
+			log.Info("Found running task %v for user %s", task, uid)
+			tasks = append(tasks, task)
+		}
+	}
+
+	return tasks, nil
+}
+
+func totalCost(cost *kubeschedulingv1beta1.Cost) float64 {
+	var priority float64
+	var total float64
+	for k, v := range cost.Spec.Resources {
+		switch k {
+		case kubeschedulingv1beta1.ResourcePriority:
+			priority = v
+		default:
+			total += v
+		}
+	}
+
+	total *= priority
+	log.Info("Total amount for %v is %v", cost, total)
+	return total
 }
 
 func budgetWithUID(uid string, namespace string, r *ReconcileTask) (*kubeschedulingv1beta1.Budget, error) {
